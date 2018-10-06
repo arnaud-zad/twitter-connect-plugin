@@ -15,12 +15,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.app.Activity;
 import android.util.Log;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.content.pm.ApplicationInfo;
 
 import com.twitter.sdk.android.core.*;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
-import com.twitter.sdk.android.tweetui.UserTimeline;
 
 import retrofit.client.Response;
 import retrofit.http.POST;
@@ -34,16 +36,37 @@ public class TwitterConnect extends CordovaPlugin {
 
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
-		Fabric.with(cordova.getActivity().getApplicationContext(), new Twitter(new TwitterAuthConfig(getTwitterKey(), getTwitterSecret())));
+        Fabric.with(
+                cordova.getActivity().getApplicationContext(),
+                new Twitter(new TwitterAuthConfig(getTwitterKey(cordova), getTwitterSecret(cordova))
+                ));
 		Log.v(LOG_TAG, "Initialize TwitterConnect");
 	}
 
-	private String getTwitterKey() {
-		return preferences.getString("TwitterConsumerKey", "");
+	private String getTwitterKey(CordovaInterface cordova) {
+        Context context = cordova.getActivity().getApplicationContext();
+        try {
+            ApplicationInfo app = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = app.metaData;
+            String key = bundle.getString("com.manifestwebdesign.twitterconnect.key");
+            Log.v(LOG_TAG, "Key is : ".concat(key));
+            return key;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
 	}
 
-	private String getTwitterSecret() {
-		return preferences.getString("TwitterConsumerSecret", "");
+	private String getTwitterSecret(CordovaInterface cordova) {
+		Context context = cordova.getActivity().getApplicationContext();
+        try {
+            ApplicationInfo app = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = app.metaData;
+            return bundle.getString("com.manifestwebdesign.twitterconnect.secret");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
 	}
 
 	public boolean execute(final String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
