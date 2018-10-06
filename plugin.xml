@@ -41,8 +41,8 @@
 			<activity android:name="com.manifestwebdesign.twitterconnect.TimelineListActivity" android:label="TimelineListActivity" android:theme="@android:style/Theme.NoTitleBar"></activity>
 		</config-file>
 		<config-file target="res/xml/config.xml" parent="widget">
-			<preference name="TwitterConsumerKey" value="$TWITTER_KEY" />
-			<preference name="TwitterConsumerSecret" value="$TWITTER_SECRET" />
+			<string name="TwitterConsumerKey">$TWITTER_KEY</string>
+			<string name="TwitterConsumerSecret">$TWITTER_SECRET</string>
 		</config-file>
 
 		<framework src="src/android/twitter.gradle" custom="true" type="gradleReference" />
